@@ -156,31 +156,45 @@ This is the primary workflow for using the system.
 The following diagram illustrates the sequence of events when a user runs the `analyze` command.
 
 ```mermaid
+%%{init: {"theme": "base", "themeVariables": {
+  "actorTextColor": "#ffffff",
+  "actorBorder": "#ff9f1c",
+  "actorBackground": "#ff9f1c",
+  "participantTextColor": "#ffffff",
+  "participantBackground": "#3a86ff",
+  "participantBorder": "#3a86ff",
+  "sequenceNumberColor": "#ff006e",
+  "primaryColor": "#8338ec",
+  "primaryTextColor": "#ffffff",
+  "tertiaryColor": "#ffbe0b",
+  "tertiaryTextColor": "#000000"
+}}}%%
+
 sequenceDiagram
     actor User
-    participant CLI (visionix.js)
-    participant Python (start.py)
-    participant Core (app.py)
+    participant CLI as CLI (visionix.js)
+    participant Python as Python (start.py)
+    participant Core as Core (app.py)
 
-    User->>CLI: visionix analyze ./path/to/video.mp4
-    CLI->>CLI: Parse 'analyze' command and video path
+    User->>CLI: `visionix analyze ./path/to/video.mp4`
+    CLI->>CLI: Parse `'analyze'` command and video path
     CLI->>CLI: Validate video file existence
-    CLI->>Python: spawn('python3', ['-u', scriptPath, videoPath])
-    Python->>Python: Receive videoPath from sys.argv
-    Python->>Core: run_stream(videoPath)
+    CLI->>Python: `spawn('python3', ['-u', scriptPath, videoPath])`
+    Python->>Python: Receive `videoPath` from `sys.argv`
+    Python->>Core: `run_stream(videoPath)`
     Core->>Core: Open video with OpenCV
     loop For each frame
         Core->>Core: Read frame
         Core->>Core: Detect pose with MediaPipe
         Core->>Core: Calculate active zones
-        Core->>Core: Update zone_last_seen timestamps
-        Core->>Core: Check for inactive zones via UNSEEN_TIMEOUT
-        Core->>User: print(f" Zone {zone_id} active...")
-        Core->>User: print(f" Zone {zone_id} inactive...")
+        Core->>Core: Update `zone_last_seen` timestamps
+        Core->>Core: Check for inactive zones via `UNSEEN_TIMEOUT`
+        Core->>User: `print(f"Zone {zone_id} active...")`
+        Core->>User: `print(f"Zone {zone_id} inactive...")`
     end
     Core-->>Python: Loop ends (video finished)
     Python-->>CLI: Process exits
-    CLI-->>User:  Process exited with code 0
+    CLI-->>User: Process exited with code `0`
 ```
 
 **Data Flow:**
