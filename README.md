@@ -35,29 +35,76 @@ The following diagram illustrates the high-level interaction between these compo
 
 ```mermaid
 flowchart TD
-    subgraph User Terminal
-        A[User runs: visionix analyze video.mp4]
-    end
 
-    subgraph Node.js CLI Layer
-        B(visionix.js) -- Spawns process --> C(start.py)
-        B -- Passes video path --> C
-    end
+%% STYLE DEFINITIONS
+classDef input fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000;
+classDef process fill:#fff3e0,stroke:#fb8c00,stroke-width:2px,color:#000;
+classDef decision fill:#ffebee,stroke:#e53935,stroke-width:2px,color:#000;
+classDef output fill:#e8f5e9,stroke:#43a047,stroke-width:2px,color:#000;
+classDef user fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000;
+classDef tech fill:#ede7f6,stroke:#512da8,stroke-width:2px,color:#000;
+classDef log fill:#f5f5f5,stroke:#9e9e9e,stroke-width:2px,color:#000;
 
-    subgraph Python ML Core
-        C -- Calls function --> D(app.py: run_stream)
-        D -- Reads video --> E[Video File]
-        D -- Processes frames --> F[OpenCV & MediaPipe]
-        F -- Generates pose data --> D
-        D -- Prints status --> G[stdout]
-    end
+%% SIMULATED STICK FIGURE USER (limited to flowchart)
+U0(["👤 User"]):::user
 
-    A --> B
-    G --> A
+%% USERS
+subgraph UserRoles
+    A1["Admin / Developer"]:::user
+    A2["Classroom / Office Users"]:::user
+end
 
-    style B fill:#D5F5E3
-    style C fill:#E8DAEF
-    style D fill:#E8DAEF
+%% INPUT MODULE
+U0 --> B1["Configure Zones via CLI"]:::input
+U0 --> B2["Start/Stop Camera Stream"]:::input
+B1 --> C1["Grid Mapping Module"]:::process
+B2 --> C2["Camera Input (Webcam/IP)"]:::input
+
+%% PROCESSING MODULE
+C2 --> D1["YOLOv8 Human Detection"]:::process
+D1 --> D2["Centroid Tracker"]:::process
+D2 --> D3["Zone Mapper"]:::process
+D3 --> D4["Zone Timer Logic"]:::process
+
+%% DECISION LOGIC
+D4 --> E1{"Zone Occupied > 10s?"}:::decision
+E1 -- Yes --> F1["Emit ON Signal"]:::output
+E1 -- No --> F2{"Zone Empty > 10s?"}:::decision
+F2 -- Yes --> F3["Emit OFF Signal"]:::output
+
+%% DEVICE CONTROL
+F1 --> G1["Device Controller / API"]:::output
+F3 --> G1
+G1 --> G2["Lights / Fans ON/OFF"]:::output
+
+%% LOGGING & MONITORING
+D4 --> H1["Zone Occupancy Logs"]:::log
+H1 --> I1["CLI Status Display"]:::log
+H1 --> I2["Web Dashboard (Future)"]:::log
+
+%% FUTURE INTEGRATION
+G1 --> J1["MQTT / Socket.IO"]:::tech
+H1 --> J2["Flask / FastAPI Layer"]:::tech
+
+%% USER FEEDBACK LOOP
+I1 --> A1
+G2 --> A2
+
+%% TECH STACK
+subgraph Technologies
+    T1["Python + OpenCV"]:::tech
+    T2["YOLOv8 (Ultralytics)"]:::tech
+    T3["Tkinter (CLI)"]:::tech
+    T4["Flask / FastAPI"]:::tech
+    T5["MQTT / Socket.IO"]:::tech
+end
+
+T1 --> D1
+T2 --> D1
+T3 --> I1
+T4 --> J2
+T5 --> J1
+
 ```
 
 **Component Breakdown:**
