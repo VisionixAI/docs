@@ -128,12 +128,12 @@ sequenceDiagram
         Core->>Core: Calculate active zones
         Core->>Core: Update zone_last_seen timestamps
         Core->>Core: Check for inactive zones via UNSEEN_TIMEOUT
-        Core->>User: print(f"✅ Zone {zone_id} active...")
-        Core->>User: print(f"⚠️ Zone {zone_id} inactive...")
+        Core->>User: print(f" Zone {zone_id} active...")
+        Core->>User: print(f" Zone {zone_id} inactive...")
     end
     Core-->>Python: Loop ends (video finished)
     Python-->>CLI: Process exits
-    CLI-->>User: ✅ Process exited with code 0
+    CLI-->>User:  Process exited with code 0
 ```
 
 **Data Flow:**
@@ -207,10 +207,10 @@ for i in range(GRID_ROWS):
 
         if elapsed > UNSEEN_TIMEOUT:
             # If the time since last seen exceeds the timeout, the zone is OFF
-            print(f"⚠️ Zone {zone_id} inactive for {int(elapsed)}s → Trigger: OFF")
+            print(f"⚠ Zone {zone_id} inactive for {int(elapsed)}s → Trigger: OFF")
         else:
             # Otherwise, the zone is considered ON
-            print(f"✅ Zone {zone_id} active → Trigger: ON")
+            print(f" Zone {zone_id} active → Trigger: ON")
 ```
 
 #### Headless Operation
@@ -243,11 +243,11 @@ This script is configured as an executable in `package.json` (not provided, but 
     ```javascript
     // File: cli/bin/visionix.js
     if (!fs.existsSync(scriptPath)) {
-      console.error(`❌ start.py not found at: ${scriptPath}`);
+      console.error(` start.py not found at: ${scriptPath}`);
       process.exit(1);
     }
     if (!input || !fs.existsSync(input)) {
-      console.error(`❌ Input video not found: ${input}`);
+      console.error(` Input video not found: ${input}`);
       process.exit(1);
     }
     ```
@@ -276,11 +276,11 @@ This module could be used by other parts of a larger Node.js application that ne
 
 ### 6. Troubleshooting and Common Issues
 
-*   **Error: `❌ start.py not found`**
+*   **Error: ` start.py not found`**
     *   **Cause:** The Node.js script cannot locate the Python entry point. This is usually due to a file being moved or an incorrect path resolution.
     *   **Solution:** Verify that the `ml-core/start.py` file exists relative to the `cli/` directory. The error message prints the exact path that was checked.
 
-*   **Error: `❌ Input video not found`**
+*   **Error: ` Input video not found`**
     *   **Cause:** The video path provided to the `analyze` command is incorrect or the file does not exist.
     *   **Solution:** Ensure you are providing a correct relative or absolute path to the video file.
 
@@ -288,6 +288,6 @@ This module could be used by other parts of a larger Node.js application that ne
     *   **Cause:** The Python dependencies are not installed, or the script is not being run within the correct virtual environment.
     *   **Solution:** Run the setup command: `visionix setup-ml`. This will create the `.visionix-venv` and install all required packages. The CLI should automatically use this environment, but if running manually, ensure it's activated.
 
-*   **Error: `❌ Cannot open video.`**
+*   **Error: ` Cannot open video.`**
     *   **Cause:** This error comes from OpenCV within `app.py`. It means that while the file path was valid, OpenCV was unable to read or decode the video stream. This can happen with corrupted files or unsupported video codecs.
     *   **Solution:** Try converting the video to a standard format like H.264 MP4. Verify the file is playable in a standard video player.
